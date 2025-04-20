@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.employee_sys.HelloController"
+            prefHeight="516.0" prefWidth="734.0">
+
+    <children>
+        <Text layoutX="190.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0"
+              text="EMPLOYEE MANAGEMENT SYSTEM" textAlignment="CENTER">
+            <font>
+                <Font size="16.0"/>
+            </font>
+        </Text>
+
+        <TextField fx:id="myTextfield" layoutX="14.0" layoutY="46.0" prefHeight="27.0" prefWidth="605.0"
+                   promptText="search by name">
+            <font>
+                <Font size="13.0"/>
+            </font>
+        </TextField>
+
+        <TextField fx:id="employeeId" layoutX="26.0" layoutY="78.0" prefHeight="25.0" prefWidth="94.0" promptText="ID"/>
+        <TextField fx:id="EmployeeSalary" layoutX="51.0" layoutY="117.0" prefHeight="25.0" prefWidth="64.0"
+                   promptText="salary"/>
+        <TextField fx:id="EmployeeDepartment" layoutX="405.0" layoutY="78.0" prefHeight="25.0" prefWidth="175.0"
+                   promptText="department"/>
+        <TextField fx:id="EmployeeName" layoutX="171.0" layoutY="78.0" prefHeight="25.0" prefWidth="142.0"
+                   promptText="name"/>
+        <TextField fx:id="EmployeeYOE" layoutX="254.0" layoutY="117.0" prefHeight="25.0" prefWidth="47.0"
+                   promptText="years"/>
+
+        <Button fx:id="Employee_search" layoutX="631.0" layoutY="49.0" mnemonicParsing="false" text="Search">
+            <font>
+                <Font size="10.0"/>
+            </font>
+        </Button>
+
+        <Button fx:id="Employee_AddBtn" layoutX="335.0" layoutY="117.0" mnemonicParsing="false" text="Add"
+                textFill="#5e0ffa"/>
+        <Button fx:id="Employee_RemoveBtn" layoutX="393.0" layoutY="117.0" mnemonicParsing="false"
+                prefHeight="25.0" prefWidth="115.0" text="Remove Employee" textFill="#fb0c0c"/>
+
+        <TreeTableView fx:id="employeeTreeTable" layoutX="11.0" layoutY="165.0" prefHeight="247.0" prefWidth="667.0">
+            <columns>
+                <TreeTableColumn fx:id="employeeTable_Id" prefWidth="45.33" text="ID"/>
+                <TreeTableColumn fx:id="employee_Table_Name" prefWidth="99.33" text="Name"/>
+                <TreeTableColumn fx:id="employee_Table_Department" prefWidth="82.0" text="Department"/>
+                <TreeTableColumn fx:id="employee_Table_Salary" prefWidth="60.0" text="Salary"/>
+                <TreeTableColumn fx:id="employee_Table_performace" prefWidth="118.66" text="Performance Rating"/>
+                <TreeTableColumn fx:id="employeeTableYOExperince" prefWidth="132.66" text="Years of Experience"/>
+                <TreeTableColumn fx:id="employee_Table_Active" prefWidth="126.66" text="Active"/>
+            </columns>
+        </TreeTableView>
+
+        <ComboBox fx:id="Employee_sort_Experience" editable="true" layoutX="407.0" layoutY="429.0"
+                  prefWidth="150.0" promptText="Experience"/>
+        <ComboBox fx:id="Employee_filter_Department" editable="true" layoutX="129.0" layoutY="430.0"
+                  prefWidth="150.0" promptText="All"/>
+
+        <Button fx:id="Employee_ApplyBtn" layoutX="579.0" layoutY="429.0" mnemonicParsing="false" text="Apply"/>
+
+        <!-- Labels -->
+        <Label alignment="CENTER" layoutX="-5.0" layoutY="81.0" prefHeight="17.0" prefWidth="38.0" text="ID"/>
+        <Label layoutX="129.0" layoutY="82.0" text="Name"/>
+        <Label layoutX="340.0" layoutY="82.0" text="Department"/>
+        <Label layoutX="12.0" layoutY="121.0" text="Salary"/>
+        <Label layoutX="138.0" layoutY="121.0" text="Years Of Experience"/>
+        <Label layoutX="11.0" layoutY="434.0" text="Filter by Department"/>
+        <Label layoutX="305.0" layoutY="434.0" text="Sort by Experience"/>
+    </children>
+</AnchorPane>
