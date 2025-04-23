@@ -16,6 +16,7 @@ public class EmployeeDatabase<T, E> {
         employeeMap.put(employee.getEmployeeid(), employee);
     }
 
+
     // READ: Get all employees
     public List<Employee<T>> getAllEmployees() {
         return new ArrayList<>(employeeMap.values());
@@ -155,10 +156,5 @@ public class EmployeeDatabase<T, E> {
                         e.getName(), e.getDepartment(), e.getSalary(), e.getPerformanceRating(),
                         e.getYearsOfExperience(), e.isActive() ? "Yes" : "No"));
     }
-
-
-
-
-
 
 }
