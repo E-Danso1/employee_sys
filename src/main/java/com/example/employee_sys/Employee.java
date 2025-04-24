@@ -31,7 +31,6 @@ public class Employee<T> implements Comparable<Employee<T>>{
 
     // getters and setters
 
-
     public T getEmployeeid() {
         return employeeId;
     }
@@ -43,18 +42,12 @@ public class Employee<T> implements Comparable<Employee<T>>{
     public String getName() {
         return name;
     }
-    
-
-
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Employee name cannot be empty");
         }
         this.name = name;
     }
-
-
-
     public String getDepartment() {
         return department;
     }
@@ -64,9 +57,14 @@ public class Employee<T> implements Comparable<Employee<T>>{
     public double getSalary() {
         return salary;
     }
+
     public void setSalary(double salary) {
+        if (salary < 0) {
+            throw new IllegalArgumentException("Salary cannot be negative.");
+        }
         this.salary = salary;
     }
+
     public double getPerformanceRating() {
         return performanceRating;
     }
@@ -101,10 +99,6 @@ public class Employee<T> implements Comparable<Employee<T>>{
                 employeeId, name, department, salary, performanceRating, yearsOfExperience, isActive ? "Yes" : "No"
         );
     }
-
-
-
-
 
 }
 

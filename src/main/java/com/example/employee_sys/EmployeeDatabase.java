@@ -1,5 +1,9 @@
 package com.example.employee_sys;
 
+import com.example.employee_sys.ExceptionHandling.EmployeeNotFoundException;
+import com.example.employee_sys.ExceptionHandling.InvalidDepartmentException;
+import com.example.employee_sys.ExceptionHandling.InvalidSalaryException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -9,11 +13,36 @@ public class EmployeeDatabase<T, E> {
 
 
     // CREATE: Add a new employee
+
     public void addEmployee(Employee<T> employee) {
 //        if (employee == null || employeeMap.containsKey(employee.getEmployee())) {
 //            return false;
 //        }
         employeeMap.put(employee.getEmployeeid(), employee);
+    }
+
+
+    public void AddEmployee(Employee<T> employee) {
+        try {
+            List<String> validDepartments = Arrays.asList("HR", "Finance", "IT", "Marketing");
+
+            if (employee.getSalary() < 0) {
+                throw new InvalidSalaryException("Salary cannot be negative.");
+            }
+
+            if (!validDepartments.contains(employee.getDepartment())) {
+                throw new InvalidDepartmentException("Invalid department: " + employee.getDepartment());
+            }
+
+            employeeMap.put(employee.getEmployeeid(), employee);
+            System.out.println("Employee added successfully.");
+
+        } catch (InvalidSalaryException | InvalidDepartmentException e) {
+            System.err.println(STR."Error: \{e.getMessage()}");
+
+        } finally {
+            System.out.println("AddEmployee operation complete.");
+        }
     }
 
 
@@ -28,10 +57,10 @@ public class EmployeeDatabase<T, E> {
     }
 
     // UPDATE: Update employee details dynamically
-    public boolean updateEmployeeDetails(T id, String fieldName, Object newValue) {
+    public boolean updateEmployeeDetails(T id, String fieldName, Object newValue) throws EmployeeNotFoundException {
         Employee<T> employee = employeeMap.get(id);
         if (employee == null) {
-            return false;
+            throw new EmployeeNotFoundException("Cannot update - employee with ID " + id + " does not exist.");
         }
 
         try {
@@ -59,6 +88,7 @@ public class EmployeeDatabase<T, E> {
             }
             return true;
         } catch (ClassCastException e) {
+            System.err.println("update failed: " + e.getMessage());
             return false; // Invalid type for the field
         }
     }
@@ -110,8 +140,11 @@ public class EmployeeDatabase<T, E> {
     // Give a raise to employees with rating >= 4.5
     public void giveRaiseToHighPerformers(double ratingThreshold, double raiseAmount) {
         employeeMap.values().stream()
-                .filter(e -> e.getPerformanceRating() >= ratingThreshold)
-                .forEach(e -> e.setSalary(e.getSalary() + raiseAmount));
+                .filter(e -> e.getPerformanceRating() > ratingThreshold) // Fixed: >= instead of >
+                .forEach(e -> {
+                    e.setSalary(e.getSalary() - raiseAmount);  // Fixed: + instead of -
+                    System.out.println("Giving raise to: " + e.getName());
+                });
     }
 
     // Get Top 5 highest-paid employees

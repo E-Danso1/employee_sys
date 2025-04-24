@@ -43,6 +43,7 @@ public class EmployeeApp extends Application {
                 // Get updated list
                 System.out.println(database.getAllEmployees());
 
+
  launch();
 
         }
