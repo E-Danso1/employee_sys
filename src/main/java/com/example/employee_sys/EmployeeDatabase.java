@@ -11,50 +11,70 @@ import java.util.stream.Collectors;
 public class EmployeeDatabase<T, E> {
     private HashMap<T, Employee<T>> employeeMap = new HashMap<>();
 
+    List<String> validDepartments = Arrays.asList("HR", "Finance", "IT", "Marketing");
 
     // CREATE: Add a new employee
+    public void addEmployee(Employee<T> employee) throws InvalidSalaryException, InvalidDepartmentException {
+        if (employee == null) {
+            System.out.println("Cannot add a null employee.");
+            return;
+        }
 
-    public void addEmployee(Employee<T> employee) {
-//        if (employee == null || employeeMap.containsKey(employee.getEmployee())) {
-//            return false;
-//        }
+        if (employee.getName() == null || employee.getName().trim().isEmpty()) {
+            System.out.println("Employee name cannot be null or empty.");
+            return;
+        }
+
+        if (employee.getDepartment() == null || employee.getDepartment().trim().isEmpty()) {
+            System.out.println("Employee department cannot be null or empty.");
+            return;
+        }
+
+        if (employee.getSalary() < 0) {
+            throw new InvalidSalaryException("Salary cannot be negative.");
+        }
+
+        // Convert valid departments to lowercase for comparison
+        List<String> validDepartments = Arrays.asList("hr", "finance", "it", "marketing");
+
+        // Compare department ignoring case
+        boolean isValid = validDepartments.stream()
+                .anyMatch(dept -> dept.equalsIgnoreCase(employee.getDepartment()));
+
+        if (!isValid) {
+            throw new InvalidDepartmentException("Invalid department: " + employee.getDepartment());
+        }
+
         employeeMap.put(employee.getEmployeeid(), employee);
+        System.out.println("Employee " + employee.getName() + " added successfully.");
     }
 
 
-    public void AddEmployee(Employee<T> employee) {
-        try {
-            List<String> validDepartments = Arrays.asList("HR", "Finance", "IT", "Marketing");
-
-            if (employee.getSalary() < 0) {
-                throw new InvalidSalaryException("Salary cannot be negative.");
-            }
-
-            if (!validDepartments.contains(employee.getDepartment())) {
-                throw new InvalidDepartmentException("Invalid department: " + employee.getDepartment());
-            }
-
+    public void AddEmployee(Employee<T> employee) throws InvalidSalaryException, InvalidDepartmentException {
             employeeMap.put(employee.getEmployeeid(), employee);
             System.out.println("Employee added successfully.");
 
-        } catch (InvalidSalaryException | InvalidDepartmentException e) {
-            System.err.println(STR."Error: \{e.getMessage()}");
-
-        } finally {
-            System.out.println("AddEmployee operation complete.");
-        }
     }
 
 
     // READ: Get all employees
     public List<Employee<T>> getAllEmployees() {
+     //   Employee<T> employee = employeeMap.get(getAllEmployees());
         return new ArrayList<>(employeeMap.values());
     }
 
+
+
     // READ: Get a specific employee by ID
-    public Employee<T> getEmployee(T id) {
-        return employeeMap.get(id);
+    public Employee<T> getEmployee(T id) throws EmployeeNotFoundException {
+        Employee<T> employee = employeeMap.get(id);
+
+        if (employee == null) {
+            throw new EmployeeNotFoundException("Employee with ID " + id + " not found.");
+        }
+        return employee;
     }
+
 
     // UPDATE: Update employee details dynamically
     public boolean updateEmployeeDetails(T id, String fieldName, Object newValue) throws EmployeeNotFoundException {
@@ -77,7 +97,7 @@ public class EmployeeDatabase<T, E> {
                 case "performance rating":
                     employee.setPerformanceRating((Double) newValue);
                     break;
-                case "yearsofexperience":
+                case "yearsofxperience":
                     employee.setYearsOfExperience((Integer) newValue);
                     break;
                 case "inactive":
@@ -98,12 +118,47 @@ public class EmployeeDatabase<T, E> {
         return employeeMap.remove(id) != null;
     }
 
+
     // Additional method to get employees sorted by years of experience (descending)
     public List<Employee<T>> getAllEmployeesSortedByExperience() {
         List<Employee<T>> employees = new ArrayList<>(employeeMap.values());
-        Collections.sort(employees);
+
+        if (employees.isEmpty()) {
+            System.out.println("No employees available to sort.");
+            return employees;
+        }
+
+        // Null-safe sort by experience (Comparable)
+        employees.sort(Comparator.nullsLast(Comparator.naturalOrder()));
         return employees;
     }
+
+
+    public List<Employee<T>> searchByName(String keyword) {
+        // Handle null or empty keyword
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("Search keyword cannot be null or empty");
+            return Collections.emptyList();
+        }
+
+
+        // Perform the search with null-safe checks
+        List<Employee<T>> result = employeeMap.values().stream()
+                .filter(Objects::nonNull)  // Filter out null employees
+                .filter(e -> e.getName() != null &&  // Check for null name
+                        e.getName().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
+
+        // Provide feedback if no results found
+        if (result.isEmpty()) {
+            System.out.println("No employees found with name containing: '" + keyword + "'");
+        }
+
+        return result;
+    }
+
+
+
 
     // ---  Searching & Filtering with Streams ---
 
@@ -113,9 +168,11 @@ public class EmployeeDatabase<T, E> {
                 .collect(Collectors.toList());
     }
 
-    public List<Employee<T>> searchByName(String keyword) {
+
+    public List<Employee<T>> getEmployeesSortedByName() {
         return employeeMap.values().stream()
-                .filter(e -> e.getName().toLowerCase().contains(keyword.toLowerCase()))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(Employee<T>::getName, Comparator.nullsLast(String::compareToIgnoreCase)))
                 .collect(Collectors.toList());
     }
 

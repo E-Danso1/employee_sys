@@ -1,5 +1,6 @@
 package com.example.employee_sys;
 
+import com.example.employee_sys.ExceptionHandling.EmployeeNotFoundException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -17,7 +18,7 @@ public class EmployeeApp extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws EmployeeNotFoundException {
 
              // Create database instance
                 EmployeeDatabase<EmployeeID, Employee<EmployeeID>> database = new EmployeeDatabase<>();
@@ -32,16 +33,19 @@ public class EmployeeApp extends Application {
 
 
         // Add employees
-                database.addEmployee(new Employee<>(id, "Ernest Danso", "IT", 75000, 4.5, 5, true));
-                database.addEmployee(new Employee<>(id2, "James Asare", "IT", 85000, 4.4, 4, true));
-               database.addEmployee(new Employee<>(id3, "McCall Watkins", "HR", 78000, 4.2, 4, true));
-               database.addEmployee(new Employee<>(id4, "Michael Opoku", "FINANCE", 75000, 4.0, 5, true));
-               database.addEmployee(new Employee<>(id5, "Eugene Omari", "FINANCE", 75000, 4.5, 4, true));
-               database.addEmployee(new Employee<>(id6, "Johnson Agyei", "HR", 88000, 4.0, 5, false));
-                database.addEmployee(new Employee<>(id7, "Samuel Nkoom", "IT", 77000, 4.3, 3, true));
-
+        try {
+            database.addEmployee(new Employee<>(id, "Ernest Danso", "IT", 75000, 4.5, 5, true));
+            database.addEmployee(new Employee<>(id2, "James Asare", "IT", 85000, 4.4, 4, true));
+            database.addEmployee(new Employee<>(id3, "McCall Watkins", "HR", 78000, 4.2, 4, true));
+            database.addEmployee(new Employee<>(id4, "Michael Opoku", "FINANCE", 75000, 4.0, 5, true));
+            database.addEmployee(new Employee<>(id5, "Eugene Omari", "FINANCE", 75000, 4.5, 4, true));
+            database.addEmployee(new Employee<>(id6, "Johnson Agyei", "HR", 88000, 4.0, 5, false));
+            database.addEmployee(new Employee<>(id7, "Samuel Nkoom", "IT", 77000, 4.3, 3, true));
+            System.out.println(database.getAllEmployees());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
                 // Get updated list
-                System.out.println(database.getAllEmployees());
 
 
  launch();

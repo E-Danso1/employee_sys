@@ -1,6 +1,9 @@
 package com.example.employee_sys;
 
 
+import com.example.employee_sys.ExceptionHandling.EmployeeNotFoundException;
+import com.example.employee_sys.ExceptionHandling.InvalidDepartmentException;
+import com.example.employee_sys.ExceptionHandling.InvalidSalaryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -36,6 +39,7 @@ public class HelloController {
     // Data storage
     private ObservableList<Employee<?>> employeeList = FXCollections.observableArrayList();
     private TreeItem<Employee<?>> rootItem = new TreeItem<>();
+    private final EmployeeDatabase<Integer, Employee<Integer>> employeeDatabase = new EmployeeDatabase<>();
 
     // Initialize method called after FXML loading
     @FXML
@@ -76,20 +80,27 @@ public class HelloController {
             // Default performance rating (you can modify this)
             double performance = 3.5;
 
-            Employee<Integer> newEmployee = new Employee<>(
-                    id, name, department, salary, performance, years, true);
 
-            employeeList.add(newEmployee);
-            updateTreeTable();
+            employeeDatabase.addEmployee( new Employee<>(id, name, department, salary, performance, years, true));
+            employeeList.add(employeeDatabase.getEmployee(id));
+            System.out.println( employeeDatabase.getAllEmployees());
+//            employeeList.add(newEmployee);
+                updateTreeTable();
 
-            // Update department filter options
-            updateDepartmentFilter();
+                // Update department filter options
+                updateDepartmentFilter();
 
-            // Clear input fields
-            clearFields();
+                // Clear input fields
+                clearFields();
 
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter valid numbers for ID, Salary, and Years of Experience.");
+            } catch (NumberFormatException e) {
+                showAlert("Invalid Input", "Please enter valid numbers for ID, Salary, and Years of Experience.");
+            } catch (InvalidDepartmentException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidSalaryException e) {
+            throw new RuntimeException(e);
+        } catch (EmployeeNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -152,6 +163,7 @@ public class HelloController {
         rootItem.getChildren().clear();
         employeeList.forEach(emp -> rootItem.getChildren().add(new TreeItem<>(emp)));
     }
+
 
     // Update department filter options
     private void updateDepartmentFilter() {

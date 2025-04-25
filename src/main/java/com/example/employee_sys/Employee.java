@@ -1,8 +1,7 @@
 package com.example.employee_sys;
 
 
-public class Employee<T> implements Comparable<Employee<T>>{
-
+public class Employee<T> implements Comparable<Employee<T>> {
 
 
     // adding the fields
@@ -35,7 +34,7 @@ public class Employee<T> implements Comparable<Employee<T>>{
         return employeeId;
     }
 
-    public void setEmployeeid(T Employeeid) {
+    public void setEmployeeId(T Employeeid) {
         this.employeeId = Employeeid;
     }
 
