@@ -7,9 +7,8 @@ import com.example.employee_sys.ExceptionHandling.InvalidSalaryException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 public class EmployeeDatabase<T, E> {
-    private HashMap<T, Employee<T>> employeeMap = new HashMap<>();
+    private final HashMap<T, Employee<T>> employeeMap = new HashMap<>();
 
     List<String> validDepartments = Arrays.asList("HR", "Finance", "IT", "Marketing");
 
@@ -49,21 +48,15 @@ public class EmployeeDatabase<T, E> {
         System.out.println("Employee " + employee.getName() + " added successfully.");
     }
 
-
     public void AddEmployee(Employee<T> employee) throws InvalidSalaryException, InvalidDepartmentException {
-            employeeMap.put(employee.getEmployeeid(), employee);
-            System.out.println("Employee added successfully.");
-
+        employeeMap.put(employee.getEmployeeid(), employee);
+        System.out.println("Employee added successfully.");
     }
-
 
     // READ: Get all employees
     public List<Employee<T>> getAllEmployees() {
-     //   Employee<T> employee = employeeMap.get(getAllEmployees());
         return new ArrayList<>(employeeMap.values());
     }
-
-
 
     // READ: Get a specific employee by ID
     public Employee<T> getEmployee(T id) throws EmployeeNotFoundException {
@@ -75,6 +68,37 @@ public class EmployeeDatabase<T, E> {
         return employee;
     }
 
+    // NEW: Search for an employee by name and throw if not found
+    public Employee<T> searchEmployeeByName(String name) throws EmployeeNotFoundException {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search name cannot be null or empty.");
+        }
+
+        return employeeMap.values().stream()
+                .filter(Objects::nonNull)
+                .filter(e -> e.getName() != null && e.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee with name '" + name + "' not found."));
+    }
+
+    // Existing searchByName (still useful for getting a list with a keyword)
+    public List<Employee<T>> searchByName(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("Search keyword cannot be null or empty");
+            return Collections.emptyList();
+        }
+
+        List<Employee<T>> result = employeeMap.values().stream()
+                .filter(Objects::nonNull)
+                .filter(e -> e.getName() != null && e.getName().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
+
+        if (result.isEmpty()) {
+            System.out.println("No employees found with name containing: '" + keyword + "'");
+        }
+
+        return result;
+    }
 
     // UPDATE: Update employee details dynamically
     public boolean updateEmployeeDetails(T id, String fieldName, Object newValue) throws EmployeeNotFoundException {
@@ -104,12 +128,12 @@ public class EmployeeDatabase<T, E> {
                     employee.setActive((Boolean) newValue);
                     break;
                 default:
-                    return false; // Invalid field name
+                    return false;
             }
             return true;
         } catch (ClassCastException e) {
-            System.err.println("update failed: " + e.getMessage());
-            return false; // Invalid type for the field
+            System.err.println("Update failed: " + e.getMessage());
+            return false;
         }
     }
 
@@ -117,7 +141,6 @@ public class EmployeeDatabase<T, E> {
     public boolean removeEmployee(T id) {
         return employeeMap.remove(id) != null;
     }
-
 
     // Additional method to get employees sorted by years of experience (descending)
     public List<Employee<T>> getAllEmployeesSortedByExperience() {
@@ -128,46 +151,16 @@ public class EmployeeDatabase<T, E> {
             return employees;
         }
 
-        // Null-safe sort by experience (Comparable)
         employees.sort(Comparator.nullsLast(Comparator.naturalOrder()));
         return employees;
     }
 
-
-    public List<Employee<T>> searchByName(String keyword) {
-        // Handle null or empty keyword
-        if (keyword == null || keyword.trim().isEmpty()) {
-            System.out.println("Search keyword cannot be null or empty");
-            return Collections.emptyList();
-        }
-
-
-        // Perform the search with null-safe checks
-        List<Employee<T>> result = employeeMap.values().stream()
-                .filter(Objects::nonNull)  // Filter out null employees
-                .filter(e -> e.getName() != null &&  // Check for null name
-                        e.getName().toLowerCase().contains(keyword.toLowerCase()))
-                .collect(Collectors.toList());
-
-        // Provide feedback if no results found
-        if (result.isEmpty()) {
-            System.out.println("No employees found with name containing: '" + keyword + "'");
-        }
-
-        return result;
-    }
-
-
-
-
     // ---  Searching & Filtering with Streams ---
-
     public List<Employee<T>> getEmployeesByDepartment(String department) {
         return employeeMap.values().stream()
                 .filter(e -> e.getDepartment().equalsIgnoreCase(department))
                 .collect(Collectors.toList());
     }
-
 
     public List<Employee<T>> getEmployeesSortedByName() {
         return employeeMap.values().stream()
@@ -189,7 +182,6 @@ public class EmployeeDatabase<T, E> {
     }
 
     // --- Iterator to traverse all employees ---
-
     public Iterator<Employee<T>> getEmployeeIterator() {
         return employeeMap.values().iterator();
     }
@@ -197,9 +189,9 @@ public class EmployeeDatabase<T, E> {
     // Give a raise to employees with rating >= 4.5
     public void giveRaiseToHighPerformers(double ratingThreshold, double raiseAmount) {
         employeeMap.values().stream()
-                .filter(e -> e.getPerformanceRating() > ratingThreshold) // Fixed: >= instead of >
+                .filter(e -> e.getPerformanceRating() > ratingThreshold)
                 .forEach(e -> {
-                    e.setSalary(e.getSalary() - raiseAmount);  // Fixed: + instead of -
+                    e.setSalary(e.getSalary() + raiseAmount);  // Fixed typo: should add not subtract
                     System.out.println("Giving raise to: " + e.getName());
                 });
     }
@@ -241,10 +233,9 @@ public class EmployeeDatabase<T, E> {
         System.out.println("-------------------------------------------------------------------------------");
 
         employeeMap.values().stream()
-                .sorted(Comparator.comparing(Employee<T>::getName)) // Alphabetical sort for clean report
+                .sorted(Comparator.comparing(Employee<T>::getName))
                 .forEach(e -> System.out.printf("%-20s %-15s $%-9.2f %-10.1f %-10d %-5s\n",
                         e.getName(), e.getDepartment(), e.getSalary(), e.getPerformanceRating(),
                         e.getYearsOfExperience(), e.isActive() ? "Yes" : "No"));
     }
-
 }

@@ -68,7 +68,6 @@ public class HelloController {
         Employee_ApplyBtn.setOnAction(event -> applyFilters());
     }
 
-    // Add new employee
     private void addEmployee() {
         try {
             int id = Integer.parseInt(employeeId.getText());
@@ -77,32 +76,31 @@ public class HelloController {
             double salary = Double.parseDouble(EmployeeSalary.getText());
             int years = Integer.parseInt(EmployeeYOE.getText());
 
-            // Default performance rating (you can modify this)
+            // Default performance rating
             double performance = 3.5;
 
-
-            employeeDatabase.addEmployee( new Employee<>(id, name, department, salary, performance, years, true));
+            // Try to add employee
+            Employee<Integer> newEmployee = new Employee<>(id, name, department, salary, performance, years, true);
+            employeeDatabase.addEmployee(newEmployee);
             employeeList.add(employeeDatabase.getEmployee(id));
-            System.out.println( employeeDatabase.getAllEmployees());
-//            employeeList.add(newEmployee);
-                updateTreeTable();
 
-                // Update department filter options
-                updateDepartmentFilter();
+            System.out.println(employeeDatabase.getAllEmployees());
 
-                // Clear input fields
-                clearFields();
+            updateTreeTable();
+            updateDepartmentFilter();
+            clearFields();
 
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Input", "Please enter valid numbers for ID, Salary, and Years of Experience.");
-            } catch (InvalidDepartmentException e) {
-            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter valid numbers for ID, Salary, and Years of Experience.");
+        } catch (InvalidDepartmentException e) {
+            showAlert("Invalid Department", e.getMessage());
         } catch (InvalidSalaryException e) {
-            throw new RuntimeException(e);
+            showAlert("Invalid Salary", e.getMessage());
         } catch (EmployeeNotFoundException e) {
-            throw new RuntimeException(e);
+            showAlert("Employee Not Found", e.getMessage());
         }
     }
+
 
     // Remove selected employee
     private void removeEmployee() {
@@ -125,10 +123,17 @@ public class HelloController {
         }
 
         rootItem.getChildren().clear();
-        employeeList.stream()
+        ObservableList<Employee<?>> filteredEmployees = employeeList.stream()
                 .filter(emp -> emp.getName().toLowerCase().contains(searchText))
-                .forEach(emp -> rootItem.getChildren().add(new TreeItem<>(emp)));
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
+
+        if (filteredEmployees.isEmpty()) {
+            showAlert("Employee Not Found", "No employee found matching: " + searchText);
+            return;
+        }
+        filteredEmployees.forEach(emp -> rootItem.getChildren().add(new TreeItem<>(emp)));
     }
+
 
     // Apply filters and sorting
     private void applyFilters() {
